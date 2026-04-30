@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, Path, Query
 
-from app.internal.security import require_internal_service_token
-from app.schemas.admin.admin_user_schema import (
+from shared_backend.security.internal_service_auth import require_internal_service_token
+from shared_backend.schemas.admin.admin_user_schema import (
     AdminUserListRead,
     AdminUserRead,
     AdminUserUpdateRequestSchema,
 )
-from app.schemas.auth.auth_schema import UserRole
+from shared_backend.schemas.auth.auth_schema import UserRole
 from app.services import admin_users_service
 
 

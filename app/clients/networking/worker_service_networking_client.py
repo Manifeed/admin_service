@@ -8,17 +8,17 @@ from app.clients.networking.service_http_client import (
     request_service,
     require_service_client,
 )
-from app.schemas.internal.worker_service_schema import WorkerServiceStatsRead
-from app.schemas.jobs.job_automation_schema import (
+from shared_backend.schemas.internal.worker_service_schema import WorkerServiceStatsRead
+from shared_backend.schemas.jobs.job_automation_schema import (
     JobAutomationRead,
     JobAutomationUpdateRequestSchema,
 )
-from app.schemas.jobs.job_enqueue_schema import (
+from shared_backend.schemas.jobs.job_enqueue_schema import (
     JobEnqueueRead,
     RssScrapeJobCreateRequestSchema,
     SourceEmbeddingJobCreateRequestSchema,
 )
-from app.schemas.jobs.job_schema import JobStatusRead, JobTaskRead, JobsOverviewRead
+from shared_backend.schemas.jobs.job_schema import JobStatusRead, JobTaskRead, JobsOverviewRead
 
 
 class WorkerServiceNetworkingClient:

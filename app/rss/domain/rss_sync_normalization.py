@@ -1,7 +1,7 @@
 import re
 
-from app.schemas.rss.rss_feed_upsert_schema import RssFeedUpsertSchema
-from app.schemas.rss.rss_source_feed_schema import RssSourceFeedSchema
+from shared_backend.schemas.rss.rss_feed_upsert_schema import RssFeedUpsertSchema
+from shared_backend.schemas.rss.rss_source_feed_schema import RssSourceFeedSchema
 
 
 def normalize_source_feed_entry(

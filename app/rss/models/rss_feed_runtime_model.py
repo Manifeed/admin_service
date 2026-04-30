@@ -4,7 +4,7 @@ from datetime import datetime
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
-from app.schemas.enums import RssFeedRuntimeStatus
+from shared_backend.schemas.enums import RssFeedRuntimeStatus
 
 
 _RSS_FEED_RUNTIME_STATUS_ENUM = sa.Enum(

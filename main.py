@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.analytics.analysis_router import analysis_router
-from app.errors.exception_handlers import register_exception_handlers
+from shared_backend.errors.exception_handlers import register_exception_handlers
 from app.health.health_router import health_router
 from app.internal.admin_stats_router import internal_admin_stats_router
 from app.middleware.csrf_middleware import csrf_origin_middleware
@@ -15,8 +15,8 @@ from app.model_registry import configure_model_registry
 from app.routers.admin_users_router import admin_users_router
 from app.routers.jobs_router import jobs_router
 from app.rss.rss_router import rss_admin_router
-from app.schemas.internal.service_schema import InternalServiceHealthRead
 from app.utils.environment_utils import is_development_environment
+from shared_backend.schemas.internal.service_schema import InternalServiceHealthRead
 
 
 class ExcludeHealthcheckAccessFilter(logging.Filter):

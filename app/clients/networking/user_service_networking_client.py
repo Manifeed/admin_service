@@ -10,12 +10,12 @@ from app.clients.networking.service_http_client import (
     request_service,
     require_service_client,
 )
-from app.schemas.admin.admin_user_schema import (
+from shared_backend.schemas.admin.admin_user_schema import (
     AdminUserListRead,
     AdminUserRead,
     AdminUserUpdateRequestSchema,
 )
-from app.schemas.auth.auth_schema import UserRole
+from shared_backend.schemas.auth.auth_schema import UserRole
 
 
 class UserServiceNetworkingClient:

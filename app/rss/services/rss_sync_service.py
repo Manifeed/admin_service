@@ -35,8 +35,8 @@ from ..domain.rss_repository_config import (
 from ..domain.rss_sync_normalization import normalize_source_feed_entry
 from .rss_job_lock_service import run_locked_rss_action
 
-from app.errors.custom_exceptions import RssRepositorySyncError
-from app.schemas.rss.rss_sync_schema import RssRepositorySyncRead, RssSyncRead
+from shared_backend.errors.custom_exceptions import RssRepositorySyncError
+from shared_backend.schemas.rss.rss_sync_schema import RssRepositorySyncRead, RssSyncRead
 from app.utils.directory_utils import list_files_on_dir_with_ext
 from app.utils.git_repository_utils import GitRepositorySyncError, list_changed_files
 

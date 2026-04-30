@@ -3,7 +3,7 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.auth.database.auth_database_client import count_connected_users, count_users
-from app.schemas.admin.admin_stats_schema import AdminStatsRead
+from shared_backend.schemas.admin.admin_stats_schema import AdminStatsRead
 from app.sources.database.get_sources_db_cli import count_sources
 
 

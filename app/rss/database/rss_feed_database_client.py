@@ -1,8 +1,8 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.rss.rss_company_schema import RssCompanyRead
-from app.schemas.rss.rss_feed_schema import RssFeedRead
+from shared_backend.schemas.rss.rss_company_schema import RssCompanyRead
+from shared_backend.schemas.rss.rss_feed_schema import RssFeedRead
 from app.utils.public_url_utils import normalize_public_http_url
 
 

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.schemas.sources.source_schema import (
+from shared_backend.schemas.sources.source_schema import (
     RssSourceAuthorRead,
     RssSourceDetailRead,
     RssSourceRead,

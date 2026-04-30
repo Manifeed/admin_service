@@ -10,7 +10,7 @@ from ..models.rss_company_model import RssCompany
 from ..models.rss_feed_model import RssFeed
 from ..models.rss_feed_tag_model import RssFeedTag
 from ..models.rss_tag_model import RssTag
-from app.schemas.rss.rss_feed_upsert_schema import RssFeedUpsertSchema
+from shared_backend.schemas.rss.rss_feed_upsert_schema import RssFeedUpsertSchema
 
 _BATCH_SIZE = 1000
 

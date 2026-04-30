@@ -28,6 +28,7 @@ not for browsers or public clients directly.
 - `app/rss`: RSS domain, SQL clients, sync workflow, and toggles
 - `app/analytics`: analysis overview and Qdrant-backed similarity routes
 - `app/clients/networking`: HTTP clients for upstream services + Redis client
+- `shared_backend`: shared schemas, inter-service auth helpers, and HTTP client primitives
 - `database.py`: SQLAlchemy engines and DB session factories
 
 ## Quick Start (Local Development)
@@ -141,10 +142,10 @@ Current tests are limited and mainly cover source compilation.
 
 ## Docker
 
-Build:
+Build from the monorepo root:
 
 ```bash
-docker build -t manifeed-admin-service -f admin_service/Dockerfile admin_service
+docker build -t manifeed-admin-service -f admin_service/Dockerfile .
 ```
 
 Run:
@@ -159,6 +160,9 @@ docker run --rm -p 8000:8000 \
 	-e INTERNAL_SERVICE_TOKEN='replace-with-strong-secret-min-32-chars' \
 	manifeed-admin-service
 ```
+
+The runtime image is multi-stage, runs as a non-root user, and installs
+`shared_backend` from a wheel built locally from the monorepo.
 
 ## Detailed Documentation
 

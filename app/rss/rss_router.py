@@ -3,16 +3,16 @@ from fastapi import APIRouter, Depends, Path, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app.schemas.rss.rss_enabled_toggle_schema import (
+from shared_backend.schemas.rss.rss_enabled_toggle_schema import (
     RssCompanyEnabledToggleRead,
     RssFeedEnabledToggleRead,
     RssEnabledTogglePayload,
 )
-from app.schemas.rss.rss_company_schema import RssCompanyRead
-from app.schemas.rss.rss_feed_schema import RssFeedRead
-from app.schemas.rss.rss_sync_schema import RssSyncRead
+from shared_backend.schemas.rss.rss_company_schema import RssCompanyRead
+from shared_backend.schemas.rss.rss_feed_schema import RssFeedRead
+from shared_backend.schemas.rss.rss_sync_schema import RssSyncRead
 
-from app.internal.security import require_internal_service_token
+from shared_backend.security.internal_service_auth import require_internal_service_token
 from .services.rss_feed_service import list_rss_company_reads, list_rss_feed_reads
 from .services.rss_icon_service import get_rss_icon_file_path
 from .services.rss_sync_service import sync_rss_catalog

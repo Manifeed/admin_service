@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.internal.security import require_internal_service_token
-from app.schemas.health import HealthRead
+from shared_backend.security.internal_service_auth import require_internal_service_token
+from shared_backend.schemas.health import HealthRead
 
 from .health_service import get_health_status
 from database import get_content_db_session, get_identity_db_session

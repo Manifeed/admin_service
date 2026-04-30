@@ -60,7 +60,7 @@ handling, and error mapping in one place.
 
 ## Error and Schema Strategy
 
-- The service uses local schema modules under `app/schemas/*`
-- Custom exceptions and handlers live under `app/errors/*`
-- Some contracts overlap with other services and should stay aligned across the
-  monorepo
+- Shared contracts, exceptions, and handlers are imported directly from
+  `shared_backend`
+- Service-local schemas remain only when they contain worker- or API-specific
+  behavior

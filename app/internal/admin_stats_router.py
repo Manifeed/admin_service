@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.admin.services.admin_stats_service import read_admin_stats
 from app.clients.networking.worker_service_networking_client import get_required_worker_service_client
-from app.internal.security import require_internal_service_token
-from app.schemas.admin.admin_stats_schema import AdminStatsRead
+from shared_backend.security.internal_service_auth import require_internal_service_token
+from shared_backend.schemas.admin.admin_stats_schema import AdminStatsRead
 from database import get_content_db_session, get_identity_db_session
 
 internal_admin_stats_router = APIRouter(

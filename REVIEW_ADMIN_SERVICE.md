@@ -45,13 +45,13 @@ Impact : aucune verification automatique ne protege les chemins critiques suivan
 
 Recommandation :
 
-- Ajouter des tests unitaires sur `app/internal/security.py`, `app/clients/networking/service_http_client.py` et les services RSS.
+- Ajouter des tests unitaires sur `shared_backend/security/internal_service_auth.py`, `app/clients/networking/service_http_client.py` et les services RSS.
 - Ajouter au moins une suite d'integration sur `/internal/admin/*` avec dependances mockees.
 - Ajouter une suite DB pour `sync_rss_catalog`, toggles RSS et `read_admin_stats`.
 
 ### Eleve - `APP_ENV` peut desactiver l'auth inter-service meme si le mode strict est demande
 
-La logique de `admin_service/app/internal/security.py` traite `APP_ENV=dev|local|test` comme prioritaire. Si cette variable est mal renseignee, le service bypassera l'auth inter-service meme si l'intention de deploiement etait stricte.
+La logique de `shared_backend/security/internal_service_auth.py` traite `APP_ENV=dev|local|test` comme prioritaire. Si cette variable est mal renseignee, le service bypassera l'auth inter-service meme si l'intention de deploiement etait stricte.
 
 Impact : un deploiement mal configure peut accepter des appels internes non authentifies.
 
@@ -63,7 +63,7 @@ Recommandation :
 
 ### Eleve - Contrats inter-services locaux, dupliques et non verifies
 
-`admin_service` consomme `user_service` et `worker_service` via des schemas locaux dans `app/schemas/*` et des clients HTTP ad hoc, au lieu de s'appuyer sur une dependance partagee versionnee comme `auth_service` le fait avec `shared_backend`.
+`admin_service` consomme `user_service` et `worker_service` via `shared_backend` pour les schemas partages, avec des clients HTTP ad hoc pour les integrations reseau.
 
 Impact : un drift de contrat entre services peut casser les appels admin sans signal avant integration. Le risque est reel pour :
 

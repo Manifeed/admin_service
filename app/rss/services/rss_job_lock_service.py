@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import TypeVar
 from sqlalchemy.orm import Session
 
-from app.errors.custom_exceptions import JobAlreadyRunningError
+from shared_backend.errors.custom_exceptions import JobAlreadyRunningError
 from app.rss.domain.job_lock import JobAlreadyRunning, job_lock
 
 _LockedActionReturn = TypeVar("_LockedActionReturn")

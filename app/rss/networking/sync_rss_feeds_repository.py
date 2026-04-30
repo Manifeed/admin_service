@@ -2,9 +2,9 @@ import json
 from pathlib import Path
 from pydantic import ValidationError
 
-from app.errors.custom_exceptions import RssCatalogParseError
-from app.schemas.rss.rss_source_feed_schema import RssSourceCatalogSchema
-from app.schemas.rss.rss_sync_schema import RssRepositorySyncRead
+from shared_backend.errors.custom_exceptions import RssCatalogParseError
+from shared_backend.schemas.rss.rss_source_feed_schema import RssSourceCatalogSchema
+from shared_backend.schemas.rss.rss_sync_schema import RssRepositorySyncRead
 
 from app.utils.directory_utils import list_files_on_dir_with_ext
 from app.utils.git_repository_utils import list_changed_files, pull_or_clone

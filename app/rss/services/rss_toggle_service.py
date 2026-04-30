@@ -6,12 +6,12 @@ from ..database.rss_toggle_database_client import (
     update_rss_company_enabled,
     update_rss_feed_enabled,
 )
-from app.errors.custom_exceptions import (
+from shared_backend.errors.custom_exceptions import (
     RssCompanyNotFoundError,
     RssFeedNotFoundError,
     RssFeedToggleForbiddenError,
 )
-from app.schemas.rss.rss_enabled_toggle_schema import (
+from shared_backend.schemas.rss.rss_enabled_toggle_schema import (
     RssCompanyEnabledToggleRead,
     RssFeedEnabledToggleRead,
 )

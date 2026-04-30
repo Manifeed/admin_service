@@ -15,7 +15,7 @@ from app.clients.networking.redis_networking_client import (
     RedisNetworkingClient,
 )
 from app.qdrant.simple_qdrant_client import SimpleQdrantClient
-from app.schemas.health import HealthRead, HealthServiceRead
+from shared_backend.schemas.health import HealthRead, HealthServiceRead
 
 HEALTH_TIMEOUT_SECONDS = 2.0
 
