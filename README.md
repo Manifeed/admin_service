@@ -69,7 +69,7 @@ Service endpoints include:
 - `GET /internal/admin/health/`
 - `GET /internal/admin/stats`
 - `GET/PATCH /internal/admin/users...`
-- `GET/POST/PATCH /internal/admin/jobs...`
+- `GET/POST/PATCH/DELETE /internal/admin/jobs...`
 - `GET/PATCH/POST /internal/admin/rss...`
 - `GET /internal/admin/analysis/...`
 

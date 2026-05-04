@@ -1,6 +1,4 @@
-import logging
 import os
-from logging.config import dictConfig
 from typing import List, Tuple
 
 from fastapi import FastAPI
@@ -15,67 +13,12 @@ from app.model_registry import configure_model_registry
 from app.routers.admin_users_router import admin_users_router
 from app.routers.jobs_router import jobs_router
 from app.rss.rss_router import rss_admin_router
-from app.utils.environment_utils import is_development_environment
 from shared_backend.schemas.internal.service_schema import InternalServiceHealthRead
-
-
-class ExcludeHealthcheckAccessFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        args = record.args
-        if not isinstance(args, tuple) or len(args) < 5:
-            return True
-
-        method = args[1]
-        path = args[2]
-        if method == "GET" and path == "/openapi.json":
-            return False
-        return True
-
-
-def _configure_app_logging() -> None:
-    dictConfig(
-        {
-            "version": 1,
-            "disable_existing_loggers": False,
-            "filters": {
-                "exclude_healthcheck_access": {
-                    "()": ExcludeHealthcheckAccessFilter,
-                }
-            },
-            "formatters": {
-                "app_default": {
-                    "()": "uvicorn.logging.DefaultFormatter",
-                    "fmt": "%(levelprefix)s %(message)s",
-                    "use_colors": None,
-                }
-            },
-            "handlers": {
-                "app_default": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "app_default",
-                    "stream": "ext://sys.stderr",
-                },
-                "uvicorn_access": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "app_default",
-                    "stream": "ext://sys.stdout",
-                    "filters": ["exclude_healthcheck_access"],
-                },
-            },
-            "loggers": {
-                "app": {
-                    "handlers": ["app_default"],
-                    "level": "INFO",
-                    "propagate": False,
-                },
-                "uvicorn.access": {
-                    "handlers": ["uvicorn_access"],
-                    "level": "INFO",
-                    "propagate": False,
-                }
-            },
-        }
-    )
+from shared_backend.utils.environment_utils import is_development_environment
+from shared_backend.utils.logging_utils import (
+    configure_service_logging,
+    create_request_logging_middleware,
+)
 
 
 def _parse_cors_origins() -> Tuple[List[str], bool]:
@@ -91,7 +34,7 @@ def _parse_cors_origins() -> Tuple[List[str], bool]:
 
 
 def create_app() -> FastAPI:
-    _configure_app_logging()
+    configure_service_logging("admin-service")
     configure_model_registry()
     app = FastAPI(
         title="Manifeed Admin Service",
@@ -104,6 +47,12 @@ def create_app() -> FastAPI:
         allow_credentials=allow_credentials,
         allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type"],
+    )
+    app.middleware("http")(
+        create_request_logging_middleware(
+            service_name="admin-service",
+            route_class="internal-admin",
+        )
     )
     app.middleware("http")(csrf_origin_middleware)
 

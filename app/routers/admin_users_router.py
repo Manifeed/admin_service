@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Depends, Path, Query
+from typing import Annotated
 
+from fastapi import APIRouter, Body, Depends, Path
+
+from shared_backend.domain.current_user import AuthenticatedUserContext
 from shared_backend.security.internal_service_auth import require_internal_service_token
-from shared_backend.schemas.admin.admin_user_schema import (
-    AdminUserListRead,
-    AdminUserRead,
-    AdminUserUpdateRequestSchema,
+from shared_backend.schemas.admin.admin_user_schema import AdminUserListRead, AdminUserRead
+from shared_backend.schemas.internal.user_service_schema import (
+    InternalCurrentUserPayload,
+    InternalAdminUserListRequest,
+    InternalAdminUserUpdateRequest,
 )
-from shared_backend.schemas.auth.auth_schema import UserRole
 from app.services import admin_users_service
 
 
@@ -17,28 +20,39 @@ admin_users_router = APIRouter(
 )
 
 
-@admin_users_router.get("", response_model=AdminUserListRead)
+@admin_users_router.post("/list", response_model=AdminUserListRead)
 def read_admin_users_route(
-    role: UserRole | None = Query(default=None),
-    is_active: bool | None = Query(default=None),
-    api_access_enabled: bool | None = Query(default=None),
-    search: str | None = Query(default=None, min_length=1, max_length=320),
-    limit: int = Query(default=100, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
+    payload: Annotated[InternalAdminUserListRequest, Body(embed=True)],
 ) -> AdminUserListRead:
     return admin_users_service.read_admin_users(
-        role=role,
-        is_active=is_active,
-        api_access_enabled=api_access_enabled,
-        search=search,
-        limit=limit,
-        offset=offset,
+        current_user=_to_current_user_context(payload.current_user),
+        role=payload.filters.role,
+        is_active=payload.filters.is_active,
+        api_access_enabled=payload.filters.api_access_enabled,
+        search=payload.filters.search,
+        limit=payload.filters.limit,
+        offset=payload.filters.offset,
     )
 
 
 @admin_users_router.patch("/{user_id}", response_model=AdminUserRead)
 def update_admin_user_route(
-    payload: AdminUserUpdateRequestSchema,
+    payload: Annotated[InternalAdminUserUpdateRequest, Body(embed=True)],
     user_id: int = Path(ge=1),
 ) -> AdminUserRead:
-    return admin_users_service.update_admin_user(user_id=user_id, payload=payload)
+    return admin_users_service.update_admin_user(
+        current_user=_to_current_user_context(payload.current_user),
+        user_id=user_id,
+        payload=payload.payload,
+    )
+
+
+def _to_current_user_context(payload: InternalCurrentUserPayload) -> AuthenticatedUserContext:
+    return AuthenticatedUserContext(
+        user_id=payload.user_id,
+        email=payload.email,
+        role=payload.role,
+        is_active=payload.is_active,
+        api_access_enabled=payload.api_access_enabled,
+        session_expires_at=payload.session_expires_at,
+    )

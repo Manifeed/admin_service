@@ -6,8 +6,7 @@ import subprocess  # nosec
 from typing import Literal
 from urllib.parse import urlparse
 
-from .directory_utils import is_empty_directory
-from .normalize_utils import normalize_file_extension
+from .directory_utils import is_empty_directory, normalize_file_extension
 
 RepositoryGitAction = Literal["cloned", "up_to_date", "update"]
 
@@ -116,6 +115,15 @@ def run_git_command(command: list[str], cwd: Path | None) -> str:
             capture_output=True,
             text=True,
         )
+    except FileNotFoundError as exception:
+        executable = exception.filename or full_command[0]
+        raise GitRepositorySyncError(
+            f"Git executable is not available in the runtime environment: {executable}"
+        ) from exception
+    except OSError as exception:
+        raise GitRepositorySyncError(
+            f"Git command could not start ({' '.join(full_command)}): {exception}"
+        ) from exception
     except subprocess.CalledProcessError as exception:
         stderr = exception.stderr.strip() or "no stderr output"
         raise GitRepositorySyncError(

@@ -1,5 +1,6 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Path, Query
+
+from fastapi import APIRouter, Body, Depends, Path, Query
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -47,7 +48,7 @@ def read_rss_feeds(
 @rss_admin_router.patch("/feeds/{feed_id}/enabled", response_model=RssFeedEnabledToggleRead)
 def update_rss_feed_enabled(
     feed_id: Annotated[int, Path(ge=1)],
-    payload: RssEnabledTogglePayload,
+    payload: Annotated[RssEnabledTogglePayload, Body(embed=True)],
     db: Session = Depends(get_content_db_session),
 ) -> RssFeedEnabledToggleRead:
     return toggle_rss_feed_enabled(
@@ -60,7 +61,7 @@ def update_rss_feed_enabled(
 @rss_admin_router.patch("/companies/{company_id}/enabled", response_model=RssCompanyEnabledToggleRead)
 def update_rss_company_enabled(
     company_id: Annotated[int, Path(ge=1)],
-    payload: RssEnabledTogglePayload,
+    payload: Annotated[RssEnabledTogglePayload, Body(embed=True)],
     db: Session = Depends(get_content_db_session),
 ) -> RssCompanyEnabledToggleRead:
     return toggle_rss_company_enabled(

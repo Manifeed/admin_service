@@ -12,7 +12,12 @@ from shared_backend.schemas.jobs.job_enqueue_schema import (
     RssScrapeJobCreateRequestSchema,
     SourceEmbeddingJobCreateRequestSchema,
 )
-from shared_backend.schemas.jobs.job_schema import JobStatusRead, JobTaskRead, JobsOverviewRead
+from shared_backend.schemas.jobs.job_schema import (
+    JobControlCommandRead,
+    JobStatusRead,
+    JobTaskRead,
+    JobsOverviewRead,
+)
 
 
 def list_jobs(*, limit: int) -> JobsOverviewRead:
@@ -47,3 +52,19 @@ def list_job_tasks(*, job_id: str) -> list[JobTaskRead]:
 
 def read_job_status(*, job_id: str) -> JobStatusRead:
     return get_required_worker_service_client().read_job_status(job_id=job_id)
+
+
+def pause_job(*, job_id: str) -> JobStatusRead:
+    return get_required_worker_service_client().pause_job(job_id=job_id)
+
+
+def resume_job(*, job_id: str) -> JobStatusRead:
+    return get_required_worker_service_client().resume_job(job_id=job_id)
+
+
+def cancel_job(*, job_id: str) -> JobStatusRead:
+    return get_required_worker_service_client().cancel_job(job_id=job_id)
+
+
+def delete_job(*, job_id: str) -> JobControlCommandRead:
+    return get_required_worker_service_client().delete_job(job_id=job_id)

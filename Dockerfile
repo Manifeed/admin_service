@@ -25,7 +25,10 @@ ENV PATH="/opt/venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-RUN useradd --create-home --home-dir /home/appuser --shell /usr/sbin/nologin appuser
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --home-dir /home/appuser --shell /usr/sbin/nologin appuser
 
 COPY --from=builder /opt/venv /opt/venv
 COPY admin_service/ /app/

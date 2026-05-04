@@ -15,7 +15,14 @@ from shared_backend.schemas.admin.admin_user_schema import (
     AdminUserRead,
     AdminUserUpdateRequestSchema,
 )
+from shared_backend.domain.current_user import AuthenticatedUserContext
 from shared_backend.schemas.auth.auth_schema import UserRole
+from shared_backend.schemas.internal.user_service_schema import (
+    InternalAdminUserListFilters,
+    InternalAdminUserListRequest,
+    InternalAdminUserUpdateRequest,
+    InternalCurrentUserPayload,
+)
 
 
 class UserServiceNetworkingClient:
@@ -42,6 +49,7 @@ class UserServiceNetworkingClient:
     def read_admin_users(
         self,
         *,
+        current_user: AuthenticatedUserContext,
         role: UserRole | None,
         is_active: bool | None,
         api_access_enabled: bool | None,
@@ -49,15 +57,20 @@ class UserServiceNetworkingClient:
         limit: int,
         offset: int,
     ) -> AdminUserListRead:
-        response = self._get(
-            "/internal/users/admin/users",
-            params={
-                "role": role,
-                "is_active": is_active,
-                "api_access_enabled": api_access_enabled,
-                "search": search,
-                "limit": limit,
-                "offset": offset,
+        response = self._post(
+            "/internal/users/admin/users/list",
+            json={
+                "payload": InternalAdminUserListRequest(
+                    current_user=_current_user_payload(current_user),
+                    filters=InternalAdminUserListFilters(
+                        role=role,
+                        is_active=is_active,
+                        api_access_enabled=api_access_enabled,
+                        search=search,
+                        limit=limit,
+                        offset=offset,
+                    ),
+                ).model_dump(mode="json", exclude_none=True)
             },
         )
         return AdminUserListRead.model_validate(response.json())
@@ -65,17 +78,26 @@ class UserServiceNetworkingClient:
     def update_admin_user(
         self,
         *,
+        current_user: AuthenticatedUserContext,
         user_id: int,
         payload: AdminUserUpdateRequestSchema,
     ) -> AdminUserRead:
         response = self._patch(
             f"/internal/users/admin/users/{user_id}",
-            json=payload.model_dump(mode="json", exclude_none=True),
+            json={
+                "payload": InternalAdminUserUpdateRequest(
+                    current_user=_current_user_payload(current_user),
+                    payload=payload,
+                ).model_dump(mode="json", exclude_none=True)
+            },
         )
         return AdminUserRead.model_validate(response.json())
 
     def _get(self, path: str, *, params: dict[str, Any]) -> httpx.Response:
         return self._request("GET", path, params=params, json=None)
+
+    def _post(self, path: str, *, json: dict[str, Any]) -> httpx.Response:
+        return self._request("POST", path, params=None, json=json)
 
     def _patch(self, path: str, *, json: dict[str, Any]) -> httpx.Response:
         return self._request("PATCH", path, params=None, json=json)
@@ -106,4 +128,15 @@ def get_required_user_service_client() -> UserServiceNetworkingClient:
     return require_service_client(
         get_user_service_client(),
         env_name="USER_SERVICE_URL",
+    )
+
+
+def _current_user_payload(current_user: AuthenticatedUserContext) -> InternalCurrentUserPayload:
+    return InternalCurrentUserPayload(
+        user_id=current_user.user_id,
+        email=current_user.email,
+        role=current_user.role,
+        is_active=current_user.is_active,
+        api_access_enabled=current_user.api_access_enabled,
+        session_expires_at=current_user.session_expires_at,
     )

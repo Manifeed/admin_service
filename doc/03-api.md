@@ -109,6 +109,22 @@ Reads a single job status from `worker_service`.
 
 Reads task-level details for a job from `worker_service`.
 
+### `POST /internal/admin/jobs/{job_id}/pause`
+
+Pauses a runnable job through `worker_service`.
+
+### `POST /internal/admin/jobs/{job_id}/resume`
+
+Resumes a paused job through `worker_service`.
+
+### `POST /internal/admin/jobs/{job_id}/cancel`
+
+Cancels a running or paused job through `worker_service`.
+
+### `DELETE /internal/admin/jobs/{job_id}`
+
+Deletes a job and its tasks through `worker_service`.
+
 ## RSS Administration
 
 ### `GET /internal/admin/rss/companies`

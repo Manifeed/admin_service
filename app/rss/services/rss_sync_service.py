@@ -76,7 +76,7 @@ def _sync_rss_catalog(db: Session, force: bool = False) -> RssSyncRead:
             branch=get_rss_feeds_repository_branch(),
         )
     except GitRepositorySyncError as exception:
-        raise RssRepositorySyncError("RSS repository sync failed") from exception
+        raise RssRepositorySyncError(str(exception)) from exception
     _log_repository_sync_action(repository_sync)
 
     sync_state = get_rss_catalog_sync_state(db)
