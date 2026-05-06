@@ -14,7 +14,6 @@
 - inter-service auth still relies on a shared secret token
 - delegated upstream contracts are locally duplicated and can drift
 - Redis command sequences are not fully atomic where TTL behavior matters
-- `rss_public_router` exists in code but is not currently registered by `main.py`
 - Docker runtime still runs from a relatively broad base image configuration
 
 ## Suggested Monitoring
@@ -30,12 +29,10 @@
 
 Update docs in this folder whenever behavior changes in:
 
-- `main.py`
-- `database.py`
-- `app/internal/*`
-- `app/health/*`
+- `app/main.py`
+- `app/database.py`
 - `app/routers/*`
 - `app/services/*`
-- `app/rss/*`
-- `app/analytics/*`
+- `app/clients/database/*`
+- `app/domain/*`
 - `app/clients/networking/*`

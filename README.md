@@ -2,8 +2,7 @@
 
 `admin_service` is the internal administration service for Manifeed.
 It exposes backend-only FastAPI endpoints for admin dashboards, RSS catalog
-administration, analysis reads, and delegated calls to `user_service` and
-`worker_service`.
+administration, and delegated calls to `user_service` and `worker_service`.
 
 This service is intended for trusted internal consumers such as `public_api`,
 not for browsers or public clients directly.
@@ -14,22 +13,20 @@ not for browsers or public clients directly.
 - Detailed dependency health reporting
 - RSS catalog listing and synchronization
 - RSS company and feed enable/disable operations
-- Analysis overview and similar-source lookup
 - Delegation of admin user management to `user_service`
 - Delegation of job and automation operations to `worker_service`
 - Internal token gate (`x-manifeed-internal-token`) on admin routes
 
 ## Architecture Overview
 
-- `app/internal`: internal auth helpers and admin stats routes
-- `app/health`: dependency-aware health endpoint
-- `app/routers`: admin user and job HTTP routes
-- `app/services`: delegated user/job business layer
-- `app/rss`: RSS domain, SQL clients, sync workflow, and toggles
-- `app/analytics`: analysis overview and Qdrant-backed similarity routes
+- `app/main.py`: application bootstrap, middleware, and router registration
+- `app/database.py`: SQLAlchemy engines and DB session factories
+- `app/routers`: admin HTTP route layer
+- `app/services`: orchestration layer for admin workflows
+- `app/clients/database`: SQL clients for RSS and admin counters
 - `app/clients/networking`: HTTP clients for upstream services + Redis client
+- `app/domain`: RSS normalization and lock helpers
 - `shared_backend`: shared schemas, inter-service auth helpers, and HTTP client primitives
-- `database.py`: SQLAlchemy engines and DB session factories
 
 ## Quick Start (Local Development)
 
@@ -60,7 +57,7 @@ export RSS_FEEDS_REPOSITORY_PATH=var/rss_feeds
 ### 3) Run the API
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 Service endpoints include:
@@ -71,7 +68,6 @@ Service endpoints include:
 - `GET/PATCH /internal/admin/users...`
 - `GET/POST/PATCH/DELETE /internal/admin/jobs...`
 - `GET/PATCH/POST /internal/admin/rss...`
-- `GET /internal/admin/analysis/...`
 
 ## Security Model
 

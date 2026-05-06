@@ -29,7 +29,7 @@ export RSS_FEEDS_REPOSITORY_PATH=var/rss_feeds
 Run the service:
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## Docker

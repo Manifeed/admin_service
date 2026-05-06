@@ -5,12 +5,12 @@ from importlib import import_module
 from sqlalchemy.orm import configure_mappers
 
 _MODEL_MODULES = (
-    "app.rss.models.rss_catalog_sync_state_model",
-    "app.rss.models.rss_company_model",
-    "app.rss.models.rss_feed_model",
-    "app.rss.models.rss_feed_runtime_model",
-    "app.rss.models.rss_feed_tag_model",
-    "app.rss.models.rss_tag_model",
+    "app.models.rss_catalog_sync_state_model",
+    "app.models.rss_company_model",
+    "app.models.rss_feed_model",
+    "app.models.rss_feed_runtime_model",
+    "app.models.rss_feed_tag_model",
+    "app.models.rss_tag_model",
 )
 
 

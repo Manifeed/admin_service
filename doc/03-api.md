@@ -160,26 +160,6 @@ Behavior:
 5. reconcile companies, feeds, and tags in Postgres
 6. persist sync success or failure state
 
-## Analysis Endpoints
-
-### `GET /internal/admin/analysis/overview`
-
-Returns:
-
-- total source count
-- indexed embedding count
-- Qdrant collection name
-
-### `GET /internal/admin/analysis/similar-sources`
-
-Returns similar sources for a given `source_id`.
-
-Parameters:
-
-- `source_id`
-- `limit`
-- `worker_version` (optional override)
-
 ## Runtime Flows
 
 ### Delegated User/Job Flow
