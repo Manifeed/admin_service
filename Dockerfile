@@ -8,13 +8,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_DEFAULT_TIMEOUT=120 \
     PIP_RETRIES=10
 
-COPY shared_backend/ /build/shared_backend/
-COPY admin_service/requirements.txt /build/admin_service/requirements.txt
+COPY --from=shared_backend_context . /build/shared_backend/
+COPY requirements.txt /build/requirements.txt
 
 RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip wheel --no-cache-dir --wheel-dir /tmp/wheels /build/shared_backend \
     && /opt/venv/bin/pip install --no-cache-dir /tmp/wheels/manifeed_shared_backend-*.whl \
-    && /opt/venv/bin/pip install --no-cache-dir --timeout 120 --retries 10 -r /build/admin_service/requirements.txt
+    && /opt/venv/bin/pip install --no-cache-dir --timeout 120 --retries 10 -r /build/requirements.txt
 
 FROM python:3.11-slim
 
@@ -31,9 +31,7 @@ RUN apt-get update \
     && useradd --create-home --home-dir /home/appuser --shell /usr/sbin/nologin appuser
 
 COPY --from=builder /opt/venv /opt/venv
-COPY admin_service/ /app/
-
-RUN chown -R appuser:appuser /app /opt/venv
+COPY --chown=appuser:appuser . /app/
 
 USER appuser
 
