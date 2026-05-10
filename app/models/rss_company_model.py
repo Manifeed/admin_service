@@ -14,15 +14,13 @@ class RssCompany(Base):
             name="ck_rss_company_fetchprotection",
         ),
         sa.Index("idx_rss_company_country", "country"),
-        sa.Index("idx_rss_company_language", "language"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(sa.String(50), nullable=False)
     host: Mapped[str | None] = mapped_column(sa.String(255), nullable=True)
     icon_url: Mapped[str | None] = mapped_column(sa.String(500), nullable=True)
-    country: Mapped[str | None] = mapped_column(sa.CHAR(2), nullable=True)
-    language: Mapped[str | None] = mapped_column(sa.CHAR(2), nullable=True)
+    country: Mapped[str] = mapped_column(sa.CHAR(2), nullable=False, server_default=sa.text("'xx'"))
     fetchprotection: Mapped[int] = mapped_column(
         sa.SmallInteger(),
         nullable=False,

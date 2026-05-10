@@ -25,7 +25,6 @@ from app.clients.networking.rss_repository_networking_client import (
 )
 from app.domain.rss_catalog_normalization import (
     normalize_country,
-    normalize_name_from_filename,
 )
 from app.domain.rss_repository_config import (
     get_rss_feeds_repository_branch,
@@ -178,7 +177,6 @@ def _sync_catalog_file(
         host=catalog.host,
         icon_url=(catalog.img.strip() if catalog.img else None),
         country=normalize_country(catalog.country),
-        language=normalize_country(catalog.language),
         fetchprotection=company_fetchprotection,
     )
     expected_urls: set[str] = set()
@@ -349,10 +347,7 @@ def _prune_companies_not_in_catalog(
     *,
     catalog_repository_path: Path,
 ) -> int:
-    current_catalog_company_names = {
-        normalize_name_from_filename(relative_catalog_path)
-        for relative_catalog_path in _list_catalog_relative_paths(catalog_repository_path)
-    }
+    current_catalog_company_names = _list_catalog_company_names(catalog_repository_path)
 
     feeds_removed = 0
     for company_id, company_name in list_rss_companies_with_feeds(db):
@@ -376,6 +371,16 @@ def _list_catalog_relative_paths(catalog_repository_path: Path) -> list[str]:
             file_extension=".json",
         )
     )
+
+
+def _list_catalog_company_names(catalog_repository_path: Path) -> set[str]:
+    company_names: set[str] = set()
+    for relative_catalog_path in _list_catalog_relative_paths(catalog_repository_path):
+        catalog = load_source_feeds_from_json(catalog_repository_path / relative_catalog_path)
+        company_name = catalog.company.strip()
+        if company_name:
+            company_names.add(company_name)
+    return company_names
 
 
 def _to_catalog_relative_path(changed_file: str) -> str | None:

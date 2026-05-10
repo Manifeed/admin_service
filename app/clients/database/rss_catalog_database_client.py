@@ -21,7 +21,6 @@ def upsert_rss_catalog_company(
     host: str | None,
     icon_url: str | None,
     country: str | None,
-    language: str | None,
     fetchprotection: int,
 ) -> int:
     row = (
@@ -33,7 +32,6 @@ def upsert_rss_catalog_company(
                     host,
                     icon_url,
                     country,
-                    language,
                     fetchprotection,
                     enabled
                 ) VALUES (
@@ -41,7 +39,6 @@ def upsert_rss_catalog_company(
                     :host,
                     :icon_url,
                     :country,
-                    :language,
                     :fetchprotection,
                     TRUE
                 )
@@ -50,7 +47,6 @@ def upsert_rss_catalog_company(
                     host = EXCLUDED.host,
                     icon_url = EXCLUDED.icon_url,
                     country = EXCLUDED.country,
-                    language = EXCLUDED.language,
                     fetchprotection = EXCLUDED.fetchprotection
                 RETURNING id
                 """
@@ -59,8 +55,7 @@ def upsert_rss_catalog_company(
                 "company_name": company_name,
                 "host": host,
                 "icon_url": icon_url,
-                "country": country,
-                "language": language,
+                "country": country or "xx",
                 "fetchprotection": max(0, min(2, fetchprotection)),
             },
         )
