@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Body, Depends, Path, Query
 
 from shared_backend.security.internal_service_auth import require_internal_service_token
@@ -10,7 +12,12 @@ from shared_backend.schemas.jobs.job_enqueue_schema import (
     RssScrapeJobCreateRequestSchema,
     SourceEmbeddingJobCreateRequestSchema,
 )
-from shared_backend.schemas.jobs.job_schema import JobStatusRead, JobTaskRead, JobsOverviewRead
+from shared_backend.schemas.jobs.job_schema import (
+    JobControlCommandRead,
+    JobStatusRead,
+    JobTaskRead,
+    JobsOverviewRead,
+)
 from app.services import jobs_service
 
 
@@ -28,14 +35,14 @@ def read_jobs_overview(limit: int = Query(default=100, ge=1, le=500)) -> JobsOve
 
 @jobs_router.post("/rss-scrape", response_model=JobEnqueueRead)
 def create_rss_scrape_job(
-    payload: RssScrapeJobCreateRequestSchema | None = Body(default=None),
+    payload: Annotated[RssScrapeJobCreateRequestSchema | None, Body(embed=True)] = None,
 ) -> JobEnqueueRead:
     return jobs_service.enqueue_rss_scrape_job(payload)
 
 
 @jobs_router.post("/source-embedding", response_model=JobEnqueueRead)
 def create_source_embedding_job(
-    payload: SourceEmbeddingJobCreateRequestSchema | None = Body(default=None),
+    payload: Annotated[SourceEmbeddingJobCreateRequestSchema | None, Body(embed=True)] = None,
 ) -> JobEnqueueRead:
     return jobs_service.enqueue_source_embedding_job(payload)
 
@@ -46,7 +53,9 @@ def read_job_automation_route() -> JobAutomationRead:
 
 
 @jobs_router.patch("/automation", response_model=JobAutomationRead)
-def update_job_automation_route(payload: JobAutomationUpdateRequestSchema) -> JobAutomationRead:
+def update_job_automation_route(
+    payload: Annotated[JobAutomationUpdateRequestSchema, Body(embed=True)],
+) -> JobAutomationRead:
     return jobs_service.update_job_automation(payload)
 
 
@@ -58,3 +67,23 @@ def read_job_tasks(job_id: str = Path(min_length=1)) -> list[JobTaskRead]:
 @jobs_router.get("/{job_id}", response_model=JobStatusRead)
 def read_job_status(job_id: str = Path(min_length=1)) -> JobStatusRead:
     return jobs_service.read_job_status(job_id=job_id)
+
+
+@jobs_router.post("/{job_id}/pause", response_model=JobStatusRead)
+def pause_job_route(job_id: str = Path(min_length=1)) -> JobStatusRead:
+    return jobs_service.pause_job(job_id=job_id)
+
+
+@jobs_router.post("/{job_id}/resume", response_model=JobStatusRead)
+def resume_job_route(job_id: str = Path(min_length=1)) -> JobStatusRead:
+    return jobs_service.resume_job(job_id=job_id)
+
+
+@jobs_router.post("/{job_id}/cancel", response_model=JobStatusRead)
+def cancel_job_route(job_id: str = Path(min_length=1)) -> JobStatusRead:
+    return jobs_service.cancel_job(job_id=job_id)
+
+
+@jobs_router.delete("/{job_id}", response_model=JobControlCommandRead)
+def delete_job_route(job_id: str = Path(min_length=1)) -> JobControlCommandRead:
+    return jobs_service.delete_job(job_id=job_id)

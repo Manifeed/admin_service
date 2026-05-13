@@ -109,6 +109,22 @@ Reads a single job status from `worker_service`.
 
 Reads task-level details for a job from `worker_service`.
 
+### `POST /internal/admin/jobs/{job_id}/pause`
+
+Pauses a runnable job through `worker_service`.
+
+### `POST /internal/admin/jobs/{job_id}/resume`
+
+Resumes a paused job through `worker_service`.
+
+### `POST /internal/admin/jobs/{job_id}/cancel`
+
+Cancels a running or paused job through `worker_service`.
+
+### `DELETE /internal/admin/jobs/{job_id}`
+
+Deletes a job and its tasks through `worker_service`.
+
 ## RSS Administration
 
 ### `GET /internal/admin/rss/companies`
@@ -143,26 +159,6 @@ Behavior:
 4. validate and normalize JSON payloads
 5. reconcile companies, feeds, and tags in Postgres
 6. persist sync success or failure state
-
-## Analysis Endpoints
-
-### `GET /internal/admin/analysis/overview`
-
-Returns:
-
-- total source count
-- indexed embedding count
-- Qdrant collection name
-
-### `GET /internal/admin/analysis/similar-sources`
-
-Returns similar sources for a given `source_id`.
-
-Parameters:
-
-- `source_id`
-- `limit`
-- `worker_version` (optional override)
 
 ## Runtime Flows
 

@@ -18,7 +18,12 @@ from shared_backend.schemas.jobs.job_enqueue_schema import (
     RssScrapeJobCreateRequestSchema,
     SourceEmbeddingJobCreateRequestSchema,
 )
-from shared_backend.schemas.jobs.job_schema import JobStatusRead, JobTaskRead, JobsOverviewRead
+from shared_backend.schemas.jobs.job_schema import (
+    JobControlCommandRead,
+    JobStatusRead,
+    JobTaskRead,
+    JobsOverviewRead,
+)
 
 
 class WorkerServiceNetworkingClient:
@@ -69,7 +74,7 @@ class WorkerServiceNetworkingClient:
             config=self._config,
             method="POST",
             path="/internal/jobs/rss-scrape",
-            json=(payload.model_dump(mode="json") if payload is not None else None),
+            json=({"payload": payload.model_dump(mode="json")} if payload is not None else None),
             http_client=self._http_client,
         )
         return JobEnqueueRead.model_validate(response.json())
@@ -82,7 +87,7 @@ class WorkerServiceNetworkingClient:
             config=self._config,
             method="POST",
             path="/internal/jobs/source-embedding",
-            json=(payload.model_dump(mode="json") if payload is not None else None),
+            json=({"payload": payload.model_dump(mode="json")} if payload is not None else None),
             http_client=self._http_client,
         )
         return JobEnqueueRead.model_validate(response.json())
@@ -104,7 +109,7 @@ class WorkerServiceNetworkingClient:
             config=self._config,
             method="PATCH",
             path="/internal/jobs/automation",
-            json=payload.model_dump(mode="json"),
+            json={"payload": payload.model_dump(mode="json")},
             http_client=self._http_client,
         )
         return JobAutomationRead.model_validate(response.json())
@@ -126,6 +131,42 @@ class WorkerServiceNetworkingClient:
             http_client=self._http_client,
         )
         return JobStatusRead.model_validate(response.json())
+
+    def pause_job(self, *, job_id: str) -> JobStatusRead:
+        response = request_service(
+            config=self._config,
+            method="POST",
+            path=f"/internal/jobs/{job_id}/pause",
+            http_client=self._http_client,
+        )
+        return JobStatusRead.model_validate(response.json())
+
+    def resume_job(self, *, job_id: str) -> JobStatusRead:
+        response = request_service(
+            config=self._config,
+            method="POST",
+            path=f"/internal/jobs/{job_id}/resume",
+            http_client=self._http_client,
+        )
+        return JobStatusRead.model_validate(response.json())
+
+    def cancel_job(self, *, job_id: str) -> JobStatusRead:
+        response = request_service(
+            config=self._config,
+            method="POST",
+            path=f"/internal/jobs/{job_id}/cancel",
+            http_client=self._http_client,
+        )
+        return JobStatusRead.model_validate(response.json())
+
+    def delete_job(self, *, job_id: str) -> JobControlCommandRead:
+        response = request_service(
+            config=self._config,
+            method="DELETE",
+            path=f"/internal/jobs/{job_id}",
+            http_client=self._http_client,
+        )
+        return JobControlCommandRead.model_validate(response.json())
 
 def get_worker_service_client() -> WorkerServiceNetworkingClient | None:
     return WorkerServiceNetworkingClient.from_env()

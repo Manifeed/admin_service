@@ -2,15 +2,13 @@
 
 ## High-Level Layers
 
-- `main.py`: application bootstrap, logging, middleware, and router registration
-- `database.py`: DB URL resolution, engine creation, and session factories
-- `app/internal`: internal security and admin stats route layer
-- `app/health`: dependency health probing for Postgres, Redis, and Qdrant
-- `app/routers`: delegated admin user and admin job HTTP routes
-- `app/services`: business layer for delegated user/job operations
-- `app/rss`: RSS read, sync, toggle, and repository logic
-- `app/analytics`: analysis overview and similar-source reads
+- `app/main.py`: application bootstrap, logging, middleware, and router registration
+- `app/database.py`: DB URL resolution, engine creation, and session factories
+- `app/routers`: thin admin HTTP route layer
+- `app/services`: orchestration layer for admin workflows
+- `app/clients/database`: RSS SQL operations and admin counters
 - `app/clients/networking`: upstream HTTP clients and Redis low-level client
+- `app/domain`: RSS normalization and lock helpers
 
 ## Route Layer
 
@@ -22,18 +20,16 @@ Main route families:
 - `/internal/admin/users...`: user administration delegated to `user_service`
 - `/internal/admin/jobs...`: job and automation operations delegated to `worker_service`
 - `/internal/admin/rss...`: RSS read and mutation endpoints
-- `/internal/admin/analysis...`: analysis overview and similar-source reads
 
 ## Business Layer
 
 Key service modules:
 
-- `app/admin/services/admin_stats_service.py`
+- `app/services/admin_stats_service.py`
 - `app/services/admin_users_service.py`
 - `app/services/jobs_service.py`
-- `app/rss/services/rss_sync_service.py`
-- `app/rss/services/rss_toggle_service.py`
-- `app/analytics/services/analysis_service.py`
+- `app/services/rss_sync_service.py`
+- `app/services/rss_toggle_service.py`
 
 These modules keep the route layer thin and isolate orchestration concerns from
 FastAPI request handling.
@@ -42,10 +38,10 @@ FastAPI request handling.
 
 Database responsibilities are split by concern:
 
-- `database.py`: content and identity DB sessions
-- `app/rss/database/*`: RSS catalog and runtime SQL operations
-- `app/sources/database/*`: source and embedding-related read models
-- `app/auth/database/auth_database_client.py`: identity-side admin counters
+- `app/database.py`: content and identity DB sessions
+- `app/clients/database/rss_*`: RSS catalog and runtime SQL operations
+- `app/clients/database/source_stats_database_client.py`: content-side admin counters
+- `app/clients/database/auth_database_client.py`: identity-side admin counters
 
 ## Upstream Dependency Layer
 

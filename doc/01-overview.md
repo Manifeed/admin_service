@@ -4,8 +4,8 @@
 
 `admin_service` is the internal administration backend for Manifeed.
 It provides admin-facing backend endpoints for operational dashboards, RSS
-catalog management, source analysis reads, and delegated workflows that are
-owned by other internal services.
+catalog management, and delegated workflows that are owned by other internal
+services.
 
 This service is designed for trusted internal consumers and should not be
 exposed directly to browsers or public clients.
@@ -16,7 +16,6 @@ exposed directly to browsers or public clients.
 - Aggregate admin statistics across content, identity, and worker state
 - Read and mutate RSS catalog state
 - Synchronize RSS catalog data from a Git repository
-- Expose analysis overview and similar-source lookup
 - Proxy admin user reads and updates to `user_service`
 - Proxy job and automation operations to `worker_service`
 
@@ -26,5 +25,5 @@ exposed directly to browsers or public clients.
 - SQLAlchemy + psycopg + PostgreSQL
 - HTTPX for internal service delegation
 - Redis for health visibility and reusable networking utilities
-- Qdrant for analysis-related vector search visibility and queries
+- Qdrant for dependency health visibility
 - Git-backed RSS repository synchronization
