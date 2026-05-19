@@ -2,7 +2,8 @@
 
 `admin_service` is the internal administration service for Manifeed.
 It exposes backend-only FastAPI endpoints for admin dashboards, RSS catalog
-administration, and delegated calls to `user_service` and `worker_service`.
+administration, admin source browsing, admin user management, and admin job
+orchestration.
 
 This service is intended for trusted internal consumers such as `public_api`,
 not for browsers or public clients directly.
@@ -11,10 +12,11 @@ not for browsers or public clients directly.
 
 - Admin statistics aggregation
 - Detailed dependency health reporting
+- Admin source listing and source detail reads
 - RSS catalog listing and synchronization
 - RSS company and feed enable/disable operations
-- Delegation of admin user management to `user_service`
-- Delegation of job and automation operations to `worker_service`
+- Direct admin user management on the identity database
+- Direct job, task, and automation orchestration on the workers database
 - Internal token gate (`x-manifeed-internal-token`) on admin routes
 
 ## Architecture Overview
@@ -67,6 +69,7 @@ Service endpoints include:
 - `GET /internal/admin/stats`
 - `GET/PATCH /internal/admin/users...`
 - `GET/POST/PATCH/DELETE /internal/admin/jobs...`
+- `GET /internal/admin/sources...`
 - `GET/PATCH/POST /internal/admin/rss...`
 
 ## Security Model

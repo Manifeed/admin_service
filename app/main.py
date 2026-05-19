@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import os
 from typing import List, Tuple
 
@@ -5,13 +6,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from shared_backend.errors.exception_handlers import register_exception_handlers
+from shared_backend.security.internal_service_auth import validate_internal_service_token_configuration
 from app.routers.health_router import health_router
 from app.routers.internal_admin_stats_router import internal_admin_stats_router
 from app.middleware.csrf_middleware import csrf_origin_middleware
 from app.model_registry import configure_model_registry
+from app.routers.admin_sources_router import admin_sources_router
 from app.routers.admin_users_router import admin_users_router
 from app.routers.jobs_router import jobs_router
 from app.routers.rss_router import rss_admin_router
+from app.services.admin_job_automation_service import (
+    start_admin_job_automation_scheduler,
+    stop_admin_job_automation_scheduler,
+)
 from shared_backend.schemas.internal.service_schema import InternalServiceHealthRead
 from shared_backend.utils.environment_utils import is_development_environment
 from shared_backend.utils.logging_utils import (
@@ -32,11 +39,23 @@ def _parse_cors_origins() -> Tuple[List[str], bool]:
     return [], False
 
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    del app
+    validate_internal_service_token_configuration()
+    start_admin_job_automation_scheduler()
+    try:
+        yield
+    finally:
+        stop_admin_job_automation_scheduler()
+
+
 def create_app() -> FastAPI:
     configure_service_logging("admin-service")
     configure_model_registry()
     app = FastAPI(
         title="Manifeed Admin Service",
+        lifespan=lifespan,
     )
 
     cors_origins, allow_credentials = _parse_cors_origins()
@@ -58,6 +77,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(internal_admin_stats_router)
     app.include_router(rss_admin_router)
+    app.include_router(admin_sources_router)
     app.include_router(admin_users_router)
     app.include_router(jobs_router)
 
