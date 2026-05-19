@@ -31,14 +31,6 @@ class RedisNetworkingClient:
     def ping(self) -> str:
         return self.execute("PING")
 
-    def increment_with_ttl(self, key: str, ttl_seconds: int) -> int:
-        if ttl_seconds <= 0:
-            raise RedisCommandError("Redis TTL must be positive")
-        count = int(self.execute("INCR", key))
-        if count == 1:
-            self.execute("EXPIRE", key, str(ttl_seconds))
-        return count
-
     def execute(self, *parts: str) -> str:
         if not parts:
             raise RedisCommandError("Redis command is empty")

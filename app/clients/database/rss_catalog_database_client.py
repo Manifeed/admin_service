@@ -109,52 +109,6 @@ def bulk_upsert_rss_catalog_feeds(
     return feed_ids_by_url
 
 
-def upsert_rss_catalog_feed(
-    db: Session,
-    *,
-    company_id: int,
-    payload: RssFeedUpsertSchema,
-) -> int:
-    row = (
-        db.execute(
-            text(
-                """
-                INSERT INTO rss_feeds (
-                    company_id,
-                    url,
-                    section,
-                    trust_score,
-                    enabled
-                ) VALUES (
-                    :company_id,
-                    :url,
-                    :section,
-                    :trust_score,
-                    :enabled
-                )
-                ON CONFLICT (url) DO UPDATE
-                SET
-                    company_id = EXCLUDED.company_id,
-                    section = EXCLUDED.section,
-                    trust_score = EXCLUDED.trust_score,
-                    enabled = EXCLUDED.enabled
-                RETURNING id
-                """
-            ),
-            {
-                "company_id": company_id,
-                "url": payload.url,
-                "section": payload.section,
-                "trust_score": payload.trust_score,
-                "enabled": payload.enabled,
-            },
-        )
-        .mappings()
-        .one()
-    )
-    return int(row["id"])
-
-
 def bulk_replace_rss_feed_tags(
     db: Session,
     *,
@@ -207,44 +161,6 @@ def bulk_replace_rss_feed_tags(
         )
 
 
-def replace_rss_feed_tags(
-    db: Session,
-    *,
-    feed_id: int,
-    tag_names: Sequence[str],
-) -> None:
-    normalized_tag_names = [tag_name for tag_name in dict.fromkeys(tag_names) if tag_name]
-
-    db.execute(
-        text(
-            """
-            DELETE FROM rss_feed_tags
-            WHERE feed_id = :feed_id
-            """
-        ),
-        {"feed_id": feed_id},
-    )
-
-    if not normalized_tag_names:
-        return
-
-    for tag_name in normalized_tag_names:
-        tag_id = _get_or_create_rss_tag_id(db, tag_name)
-        db.execute(
-            text(
-                """
-                INSERT INTO rss_feed_tags (feed_id, tag_id)
-                VALUES (:feed_id, :tag_id)
-                ON CONFLICT (feed_id, tag_id) DO NOTHING
-                """
-            ),
-            {
-                "feed_id": feed_id,
-                "tag_id": tag_id,
-            },
-        )
-
-
 def delete_rss_company_feeds_not_in_urls(
     db: Session,
     *,
@@ -280,24 +196,6 @@ def delete_rss_company_feeds_not_in_urls(
     return result.rowcount or 0
 
 
-def list_rss_company_ids_with_feeds(db: Session) -> list[int]:
-    rows = (
-        db.execute(
-            text(
-                """
-                SELECT DISTINCT company_id
-                FROM rss_feeds
-                WHERE company_id IS NOT NULL
-                ORDER BY company_id ASC
-                """
-            )
-        )
-        .mappings()
-        .all()
-    )
-    return [int(row["company_id"]) for row in rows]
-
-
 def list_rss_companies_with_feeds(db: Session) -> list[tuple[int, str]]:
     rows = (
         db.execute(
@@ -325,34 +223,6 @@ def delete_rss_companies_without_feeds(db: Session) -> int:
         )
     )
     return result.rowcount or 0
-
-
-def _get_or_create_rss_tag_id(db: Session, tag_name: str) -> int:
-    db.execute(
-        text(
-            """
-            INSERT INTO rss_tags (name)
-            VALUES (:tag_name)
-            ON CONFLICT (name) DO NOTHING
-            """
-        ),
-        {"tag_name": tag_name},
-    )
-    row = (
-        db.execute(
-            text(
-                """
-                SELECT id
-                FROM rss_tags
-                WHERE name = :tag_name
-                """
-            ),
-            {"tag_name": tag_name},
-        )
-        .mappings()
-        .one()
-    )
-    return int(row["id"])
 
 
 def _list_rss_tag_ids_by_name(
