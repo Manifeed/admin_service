@@ -1,5 +1,4 @@
 from pathlib import Path
-from pathlib import PurePosixPath
 
 def is_empty_directory(path: Path) -> bool:
     return path.exists() and path.is_dir() and not any(path.iterdir())
